@@ -149,6 +149,7 @@
                       v-if="!todoItem.isCompleted"
                       type="success"
                       circle
+                      @click="completeToDo(index)"
                     >
                       <el-icon><check /></el-icon>
                     </el-button>
@@ -162,7 +163,7 @@
                   content="删除记事"
                 >
                   <template #reference>
-                    <el-button type="info" circle
+                    <el-button type="info" circle @click="deleteToDo(index)"
                       ><el-icon><delete /></el-icon></el-button></template
                 ></el-popover>
                 <!--编辑记事对话框-->
@@ -349,6 +350,19 @@ export default {
       this.isShowDatePicker[index] = false;
       ElMessage({
         message: "修改提醒时间成功",
+        center: true,
+        type: "success",
+        // offset: 150
+      });
+    },
+    // 完成记事
+    completeToDo(index) {
+      store.commit("updateToDoIsComplete", {
+        index: index,
+        isCompleted: true,
+      });
+      ElMessage({
+        message: "待办已完成",
         center: true,
         type: "success",
         // offset: 150

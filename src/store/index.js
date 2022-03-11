@@ -84,6 +84,9 @@ export default createStore({
     },
     updateToDoTime(state, playload) {
       state.toDoLists[playload.index].toDoTime = playload.toDoTime;
+    },
+    updateToDoIsComplete(state, playload) {
+      state.toDoLists[playload.index].isCompleted = playload.isCompleted
     }
   },
   actions: {
