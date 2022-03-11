@@ -81,6 +81,9 @@ export default createStore({
     },
     updateToDoList(state, playload) {
       state.toDoLists.splice(playload.index, 1, playload.toDoObj)
+    },
+    updateToDoTime(state, playload) {
+      state.toDoLists[playload.index].toDoTime = playload.toDoTime;
     }
   },
   actions: {
