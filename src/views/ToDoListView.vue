@@ -186,10 +186,26 @@
                 </el-dialog>
               </div>
               <div class="endTime">
-                <el-icon><alarm-clock /></el-icon> {{ todoItem.toDoTime
-                }}<el-icon class="edit-todoTime" color="gray"
-                  ><edit-pen
-                /></el-icon>
+                <div v-if="!isShowDatePicker[index]">
+                  <el-icon><alarm-clock /></el-icon> {{ todoItem.toDoTime
+                  }}<el-icon
+                    class="edit-todoTime"
+                    color="gray"
+                    v-show="isShowFooter && currentLi === index"
+                    @click="editToDoTime(index)"
+                    ><edit-pen
+                  /></el-icon>
+                </div>
+                <el-date-picker
+                  v-model="toDoTime"
+                  type="datetime"
+                  :shortcuts="shortcuts"
+                  value-format="YYYY-MM-DD hh:mm:ss"
+                  size="small"
+                  v-if="isShowDatePicker[index]"
+                  @change="timeChange(toDoTime, index)"
+                >
+                </el-date-picker>
               </div>
             </el-footer>
           </el-container>
@@ -227,6 +243,30 @@ export default {
       tagValue: "",
       selectVisible: [],
       editToDoDialogVisible: false,
+      toDoTime: "",
+      shortcuts: [
+        {
+          text: "Today",
+          value: new Date(),
+        },
+        {
+          text: "Yesterday",
+          value: () => {
+            const date = new Date();
+            date.setTime(date.getTime() - 3600 * 1000 * 24);
+            return date;
+          },
+        },
+        {
+          text: "A week ago",
+          value: () => {
+            const date = new Date();
+            date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+            return date;
+          },
+        },
+      ],
+      isShowDatePicker: [],
     };
   },
   store,
@@ -295,6 +335,25 @@ export default {
         }
       });
     },
+    // 修改提醒事件
+    editToDoTime(index) {
+      // alert("修改todoTime");
+      this.isShowDatePicker[index] = true;
+    },
+    // 时间选择器选择改变
+    timeChange(value, index) {
+      store.commit("updateToDoTime", {
+        index: index,
+        toDoTime: value,
+      });
+      this.isShowDatePicker[index] = false;
+      ElMessage({
+        message: "修改提醒时间成功",
+        center: true,
+        type: "success",
+        // offset: 150
+      });
+    },
   },
   computed: {
     isCompleted(val) {
@@ -311,6 +370,7 @@ export default {
     // const length = this.toDoLists.length;
     this.toDoLists.forEach((item) => {
       this.selectVisible.push(false);
+      this.isShowDatePicker.push(false);
     });
   },
 };
