@@ -368,6 +368,16 @@ export default {
         // offset: 150
       });
     },
+    // 删除记事
+    deleteToDo(index) {
+      store.commit("deleteToDo", { index: index });
+      ElMessage({
+        message: "记事已删除",
+        center: true,
+        type: "success",
+        // offset: 150
+      });
+    },
   },
   computed: {
     isCompleted(val) {

@@ -56,8 +56,8 @@ export default createStore({
         toDoTags: []
       },
     ],
-    // 记事标签
-
+    // 已被删除的记事
+    deletedToDoLists: []
   },
   getters: {
   },
@@ -87,6 +87,12 @@ export default createStore({
     },
     updateToDoIsComplete(state, playload) {
       state.toDoLists[playload.index].isCompleted = playload.isCompleted
+    },
+    deleteToDo(state, playload) {
+      const deleteTodo = state.toDoLists.splice(playload.index, 1)
+      // 往回收站写入被删除的记事
+      state.deletedToDoLists.push(deleteTodo[0]);
+      console.log("回收站:" + state.deletedToDoLists[0].title);
     }
   },
   actions: {
