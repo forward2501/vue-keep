@@ -30,38 +30,11 @@
         <el-icon><edit-pen /></el-icon>
         <template #title>修改标签</template>
       </el-menu-item>
+      <el-menu-item index="deletedToDo">
+        <el-icon><delete /></el-icon>
+        <template #title>回收站</template>
+      </el-menu-item>
     </el-menu>
-    <!-- <el-drawer
-      v-model="isCollapse"
-      :with-header="false"
-      :modal="false"
-      direction="ltr"
-      size="20%"
-      :append-to-body="true"
-      :custom-class="drawer-custom"
-    >
-      <el-menu
-        :default-active="currentMenuName"
-        active-text-color="blue"
-        class="el-menu-vertical-demo"
-        :collapse="isCollapse"
-        :router="true"
-        @select="select"
-      >
-        <el-menu-item index="todo">
-          <el-icon><bell /></el-icon>
-          <template #title>记事</template>
-        </el-menu-item>
-        <el-menu-item index="note">
-          <el-icon><list /></el-icon>
-          <template #title>笔记</template>
-        </el-menu-item>
-        <el-menu-item index="tagSetting">
-          <el-icon><setting /></el-icon>
-          <template #title>标签管理</template>
-        </el-menu-item>
-      </el-menu>
-    </el-drawer> -->
   </div>
 </template>
 <script>
@@ -104,7 +77,7 @@ export default {
 // }
 .el-menu-vertical-demo:not(.el-menu--collapse) {
   width: 100%;
-  min-height: 800px;
+  max-height: 800px;
   margin-top: 5px;
 }
 .el-menu-item.is-active {
