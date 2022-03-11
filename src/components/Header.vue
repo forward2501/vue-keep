@@ -83,8 +83,8 @@ export default {
     position: absolute;
     top: 50%;
     margin-top: -25px;
-    width: 500px;
-    left: 300px;
+    width: 600px;
+    left: 400px;
   }
   .el-divider {
     position: absolute;
