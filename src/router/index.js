@@ -3,7 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import TodoListView from '../views/ToDoListView.vue'
 // import NoteView from '../views/NoteView.vue'
 // import TagSettingView from '../views/TagSettingView.vue'
-import AddToDo from '@/components/AddToDo.vue'
+// import AddToDo from '@/components/AddToDo.vue'
 const routes = [
   {
     path: '/',
@@ -31,13 +31,14 @@ const routes = [
         // 懒加载
         component: () => import(/* webpackChunkName: "about" */ '../views/TagSettingView.vue'),
         // component: TagSettingView
+      },
+      {
+        path: '/deletedToDo',
+        name: 'deletedToDo',
+        component: () => import(/* webpackChunkName: "about" */ '../views/DeletedToDoView.vue'),
       }
     ]
-  }, {
-    path: '/addToDo',
-    name: 'addToDo',
-    component: AddToDo
-  }
+  },
 ]
 
 const router = createRouter({
