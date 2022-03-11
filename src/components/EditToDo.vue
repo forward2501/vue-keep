@@ -27,6 +27,7 @@
       <el-form-item label="标签">
         <el-select
           multiple
+          collapse-tags
           v-model="toDoFormModel.tagValue"
           class="m-2 tagSelect"
           placeholder="Select a tag"
@@ -164,6 +165,7 @@ export default {
             // offset: 150
           });
           // 关闭对话框
+          this.$emit("closeDialog", false);
         } else {
           console.log("error submit!");
           return false;
@@ -193,5 +195,11 @@ export default {
   width: 500px;
   height: 500px;
   margin: 50px auto;
+}
+.el-button {
+  margin-left: 80px;
+}
+.el-button + .el-button {
+  margin-left: 50px;
 }
 </style>

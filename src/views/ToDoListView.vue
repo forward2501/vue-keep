@@ -172,7 +172,7 @@
                   top="8vh"
                   destroy-on-close="true"
                 >
-                  <EditToDo :toDoIndex="currentLi"></EditToDo>
+                  <EditToDo :toDoIndex="currentLi" v-on:closeDialog="closeEditDialog"></EditToDo>
                   <template #footer>
                     <div class="dialog-footer">
                       <el-button @click="editToDoDialogVisible = false"
@@ -276,6 +276,9 @@ export default {
     editToDOList(index) {
       this.editToDoDialogVisible = true;
       this.currentLi = index;
+    },
+    closeEditDialog(data) {
+      this.editToDoDialogVisible = data;
     },
   },
   computed: {
