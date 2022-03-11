@@ -40,8 +40,8 @@ export default {
     height: 85%;
     .el-aside{
       width: 20%;
-      height: 100%;
-      overflow-y: hidden
+      max-height: 800px;
+      overflow-y: auto
     }
     .el-main{
       width: 80%;
