@@ -15,7 +15,7 @@ export default createStore({
       {
         title: "记事1",
         content: '内容1内容111111111111111111111111111',
-        toDoTime: '默认时间1',
+        toDoTime: '2022-03-09 11:34:03',
         isCompleted: false,
         isOutOfTime: false,
         // 标签
@@ -24,7 +24,7 @@ export default createStore({
       {
         title: "记事2",
         content: '内容2内容11112221111111111111111内容2内容11112221111111111111111内容2内容11112221111111111111111内容2内容11112221111111111111111内容2内容11112221111111111111111内容2内容11112221111111111111111内容2内容11112221111111111111111',
-        toDoTime: '默认时间2',
+        toDoTime: '2022-03-09 13:23:43',
         isCompleted: false,
         isOutOfTime: false,
         toDoTags: [{ name: '感情' }, { name: 'school' }]
@@ -32,7 +32,7 @@ export default createStore({
       {
         title: "记事3",
         content: "吃饭睡大觉",
-        toDoTime: '默认时间3',
+        toDoTime: '2022-03-09 15:00:00',
         isCompleted: true,
         isOutOfTime: false,
         toDoTags: [{ name: '美妆' }, { name: 'family' }]
@@ -41,7 +41,7 @@ export default createStore({
       {
         title: "记事4",
         content: "吃饭睡大觉",
-        toDoTime: '默认时间4',
+        toDoTime: '2022-03-10 08:00:00',
         isCompleted: true,
         isOutOfTime: false,
         toDoTags: [{ name: '美妆' }, { name: 'family' }]
@@ -50,31 +50,11 @@ export default createStore({
       {
         title: "记事5",
         content: "吃饭睡大觉",
-        toDoTime: '默认时间5',
+        toDoTime: '',
         isCompleted: false,
         isOutOfTime: true,
         toDoTags: []
       },
-    ],
-    // 已完成的待办
-    completedToDoLists: [
-      {
-        title: "待办3",
-        content: "吃饭睡大觉",
-        toDoTime: '默认时间3',
-        isCompleted: true,
-        isOutOfTime: false
-      }
-    ],
-    // 已过期未完成的待办
-    oldToDoLists: [
-      {
-        title: "待办3",
-        content: "吃饭睡大觉",
-        toDoTime: '默认时间3',
-        isCompleted: false,
-        isOutOfTime: true
-      }
     ],
     // 记事标签
 
@@ -96,8 +76,12 @@ export default createStore({
       state.isCollapse = val;
     },
     updateToDoListTag(state, index, tagObj) {
-      console.log(tagObj.name);
+      // console.log("调用vuex" + tagObj.name + index);
       state.toDoLists[index].toDoTags.push(tagObj);
+    },
+    updateToDoList(state, playload) {
+      // alert("调用编辑记事" + playload.toDoObj.title)
+      state.toDoLists.splice(playload.index, 1, playload.toDoObj)
     }
   },
   actions: {
