@@ -172,7 +172,10 @@
                   top="8vh"
                   destroy-on-close="true"
                 >
-                  <EditToDo :toDoIndex="currentLi" v-on:closeDialog="closeEditDialog"></EditToDo>
+                  <EditToDo
+                    :toDoIndex="currentLi"
+                    v-on:closeDialog="closeEditDialog"
+                  ></EditToDo>
                   <template #footer>
                     <div class="dialog-footer">
                       <el-button @click="editToDoDialogVisible = false"
@@ -277,8 +280,20 @@ export default {
       this.editToDoDialogVisible = true;
       this.currentLi = index;
     },
+    // 监听子组件事件之后的处理函数
     closeEditDialog(data) {
       this.editToDoDialogVisible = data;
+    },
+    //  移除标签
+    handleClose(name) {
+      this.toDoLists[this.currentLi].toDoTags.forEach((item) => {
+        if (name === item.name) {
+          this.toDoLists[this.currentLi].toDoTags.splice(
+            this.toDoLists[this.currentLi].toDoTags.indexOf(item),
+            1
+          );
+        }
+      });
     },
   },
   computed: {
