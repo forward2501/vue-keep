@@ -9,7 +9,7 @@
       @focus="addToDoDialogVisible = true"
     ></el-input>-->
     <el-button
-      type="plain"
+      type="text"
       class="inputToDo"
       @click="addToDoDialogVisible = true"
     >
@@ -70,7 +70,7 @@
               <div class="endTime">提醒时间：{{ todoItem.toDoTime }}</div>
               <div class="toDoTag">
                 <el-tag
-                  v-for="tag in todoItem.toDoTags"
+                  v-for="tag of todoItem.toDoTags"
                   :key="tag.name"
                   type=""
                   class="mx-1"
@@ -81,23 +81,6 @@
                 >
                   {{ tag.name }}
                 </el-tag>
-                <el-select
-                  v-model="tagValue"
-                  class="m-2 tagSelect"
-                  placeholder="Select a tag"
-                  size="small"
-                  v-if="selectVisible && currentLi === index"
-                  @change="change(tagValue, index)"
-                  filterable
-                >
-                  <el-option
-                    v-for="item in toDoTagsOptions"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  >
-                  </el-option>
-                </el-select>
                 <el-popover
                   v-if="!selectVisible && isShowFooter && currentLi === index"
                   placement="bottom-start"
@@ -114,6 +97,24 @@
                       ><el-icon><plus /></el-icon
                     ></el-button> </template
                 ></el-popover>
+                <!--标签选择框-->
+                <el-select
+                  v-model="tagValue"
+                  v-if="selectVisible"
+                  class="m-2 tagSelect"
+                  placeholder="Select a tag"
+                  size="small"
+                  @change="change(tagValue, index)"
+                  filterable
+                >
+                  <el-option
+                    v-for="item in toDoTagsOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
+                  </el-option>
+                </el-select>
               </div>
             </el-main>
             <el-footer class="footer">
@@ -126,7 +127,10 @@
                   content="编辑记事"
                 >
                   <template #reference
-                    ><el-button type="primary" circle
+                    ><el-button
+                      type="primary"
+                      circle
+                      @click="editToDOList(index)"
                       ><el-icon><edit /></el-icon></el-button></template
                 ></el-popover>
                 <el-popover
@@ -157,6 +161,22 @@
                     <el-button type="info" circle
                       ><el-icon><delete /></el-icon></el-button></template
                 ></el-popover>
+                <!--编辑记事对话框-->
+                <el-dialog
+                  v-model="editToDoDialogVisible"
+                  title="编辑记事"
+                  top="8vh"
+                  destroy-on-close="true"
+                >
+                  <EditToDo :toDoIndex="currentLi"></EditToDo>
+                  <template #footer>
+                    <div class="dialog-footer">
+                      <el-button @click="editToDoDialogVisible = false"
+                        >关闭</el-button
+                      >
+                    </div>
+                  </template>
+                </el-dialog>
               </div>
             </el-footer>
           </el-container>
@@ -264,11 +284,12 @@
 import store from "@/store/index.js";
 // import Dialog from "@/components/Dialog.vue";
 import AddToDo from "@/components/AddToDo.vue";
+import EditToDo from "@/components/EditToDo.vue";
 import { ElMessageBox, ElMessage } from "element-plus";
 
 export default {
   name: "ToDoListView",
-  components: { AddToDo },
+  components: { AddToDo, EditToDo },
   data() {
     return {
       toDoLists: store.state.toDoLists,
@@ -284,9 +305,11 @@ export default {
       // 鼠标聚焦时才显示footer
       isShowFooter: false,
       currentLi: 0,
-      tagValue: "",
       // 是否展示选择器
+      tagList: [],
+      tagValue: "",
       selectVisible: false,
+      editToDoDialogVisible: false,
     };
   },
   store,
@@ -303,11 +326,15 @@ export default {
       this.isShowFooter = false;
       this.currentLi = null;
     },
+    updateToDoListTags(index, tagObj) {
+      store.commit("updateToDoListTag", index, tagObj);
+    },
     // 标签选择器选择改变
     change(val, index) {
       // alert("当前选择:" + val);
+      this.updateToDoListTags(index, { name: val });
       ElMessageBox.confirm(
-        "当前选择新增标签为:" + val + "，确认新增?",
+        "当前选择新增标签为:" + val + index + "，确认新增?",
         "提示",
         {
           confirmButtonText: "确认",
@@ -317,9 +344,10 @@ export default {
       )
         .then(() => {
           // 新增标签逻辑
-          const tagObj = { name: val };
-          console.log(tagObj.name);
-          store.commit("updateToDoListTag", index, tagObj);
+          const tagObj = [{ name: val }];
+          console.log(tagObj.name + index);
+          // this.updateToDoListTags(index, tagObj);
+          this.selectVisible = false;
           ElMessage({
             type: "success",
             message: "新增标签成功",
@@ -327,12 +355,18 @@ export default {
         })
         .catch(() => {
           // 新增失败
+          this.selectVisible = false;
           ElMessage({
             type: "error",
             message: "取消新增",
           });
         });
     }, // change
+    // 编辑记事
+    editToDOList(index) {
+      this.editToDoDialogVisible = true;
+      this.currentLi = index;
+    },
   },
   computed: {
     isCompleted(val) {
@@ -343,6 +377,12 @@ export default {
     toDoTagsOptions() {
       return store.state.toDoTagsOptions;
     },
+    // tagValue() {
+    //   const tagValueArr = this.tagList.map((item) => ({
+    //     value: ""
+    //   }));
+    //   return tagValueArr;
+    // },
   },
 };
 </script>
