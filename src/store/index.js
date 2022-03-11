@@ -75,12 +75,11 @@ export default createStore({
     updateIsCollapse(state, val) {
       state.isCollapse = val;
     },
-    updateToDoListTag(state, index, tagObj) {
+    updateToDoListTag(state, playload) {
       // console.log("调用vuex" + tagObj.name + index);
-      state.toDoLists[index].toDoTags.push(tagObj);
+      state.toDoLists[playload.index].toDoTags.push(playload.tagObj);
     },
     updateToDoList(state, playload) {
-      // alert("调用编辑记事" + playload.toDoObj.title)
       state.toDoLists.splice(playload.index, 1, playload.toDoObj)
     }
   },
