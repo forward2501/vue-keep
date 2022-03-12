@@ -58,13 +58,24 @@ export default createStore({
     ],
     // 已被删除的记事
     deletedToDoLists: [],
-    // 需要提醒的记事
-    // notifyToDoLosts: []
+    // showUpdateTagMenu: false
+    searchContent: '',
+    searchResult: []
   },
   getters: {
     notifyToDoLosts(state) { // 需要提醒的记事，在toDoLists中进行过滤
       return state.toDoLists.filter(function (todo) {
         return todo.toDoTime !== '' && todo.toDoTime !== null
+      })
+    },
+    getClickTagToDoList: (state) => (tagName) => {
+      return state.toDoLists.filter(function (item) {
+        return item.toDoTags.forEach(item2 => item2.name === tagName)
+      })
+    },
+    getSearchToDoLists: (state) => (content) => {
+      return state.toDoLists.filter(function (item) {
+        return (item.title.indexOf(content) !== -1 || item.content.indexOf(content) !== -1)
       })
     }
   },
@@ -122,7 +133,13 @@ export default createStore({
     // 删除标签
     deleteToDoTagsOptions(state, playload) {
       state.toDoTagsOptions.splice(playload.index, 1)
-    }
+    },
+    // updateShowUpdateTagMenu(state, playload) {
+    //   state.showUpdateTagMenu = playload.status
+    // }
+    updateSearchContent(state, content) {
+      state.searchContent = content
+    },
   },
   actions: {
   },
