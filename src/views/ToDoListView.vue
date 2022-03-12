@@ -1,21 +1,22 @@
 <template>
   <div>
-    <!--<el-input
+    <el-input
+      ref="addToDoInputRef"
       v-model="inputToDo"
       class="w-50 m-2 inputToDo"
-      placeholder="添加记事"
+      placeholder="添加记事..."
       icon="el-icon-search"
       type="text"
-      @focus="addToDoDialogVisible = true"
-    ></el-input>-->
-    <el-button
+      @click="clickAddToDo"
+    ></el-input>
+    <!-- <el-button
       type="text"
-      class="inputToDo"
+      class="inputToDoButton"
       @click="addToDoDialogVisible = true"
     >
       添加记事
       <el-icon><plus /></el-icon>
-    </el-button>
+    </el-button> -->
     <!--对话框-->
     <el-dialog
       v-model="addToDoDialogVisible"
@@ -188,8 +189,14 @@
               </div>
               <div class="endTime">
                 <div v-if="!isShowDatePicker[index]">
-                  <el-icon v-if="todoItem.toDoTime !== '' && todoItem.toDoTime !== null">
-                    <clock /></el-icon> {{ todoItem.toDoTime
+                  <el-icon
+                    v-if="
+                      todoItem.toDoTime !== '' && todoItem.toDoTime !== null
+                    "
+                  >
+                    <clock
+                  /></el-icon>
+                  {{ todoItem.toDoTime
                   }}<el-icon
                     class="edit-todoTime"
                     color="gray"
@@ -215,20 +222,21 @@
       </ul>
     </div>
   </div>
+  <!-- <TagSetting :isShowTagSetting="isShowTagSetting"></TagSetting> -->
 </template>
 <script>
 import store from "@/store/index.js";
-// import Dialog from "@/components/Dialog.vue";
 import AddToDo from "@/components/AddToDo.vue";
 import EditToDo from "@/components/EditToDo.vue";
 import { ElMessageBox, ElMessage } from "element-plus";
+// import TagSetting from "@/components/TagSetting.vue";
 
 export default {
   name: "ToDoListView",
   components: { AddToDo, EditToDo },
   data() {
     return {
-      toDoLists: store.state.toDoLists,
+      // toDoLists: store.state.toDoLists,
       inputToDo: "",
       todoStatus: { isCompleted: "", isOutOfTime: "" },
       // 是否展示添加记事对话框
@@ -378,8 +386,20 @@ export default {
         // offset: 150
       });
     },
+    clickAddToDo() {
+      this.addToDoDialogVisible = true;
+      this.$refs.addToDoInputRef.blur();
+    },
   },
   computed: {
+    toDoLists() {
+      return store.getters.getSearchToDoLists(store.state.searchContent);
+      // if (store.state.searchContent.trim() !== "") {
+      //   return store.getters.getSearchToDoLists(store.state.searchContent);
+      // } else {
+      //   return store.state.toDoLists;
+      // }
+    },
     isHaveToDo() {
       if (store.state.toDoLists.length !== 0) {
         return true;
@@ -395,6 +415,13 @@ export default {
     toDoTagsOptions() {
       return store.state.toDoTagsOptions;
     },
+    // isShowTagSetting() {
+    //   if (store.state.showUpdateTagMenu) {
+    //     return true;
+    //   } else {
+    //     return false;
+    //   }
+    // },
   },
   mounted() {
     // return this.selectVisible && this.currentLi === index;
@@ -407,10 +434,15 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.inputToDo {
+.inputToDoButton {
   margin-top: 20px;
   margin-left: 20px;
   width: 100px;
+}
+.inputToDo {
+  margin-top: 20px;
+  margin-left: 20px;
+  width: 500px;
 }
 .toListItem {
   list-style: none;
@@ -433,8 +465,6 @@ export default {
       width: 100%;
       height: 200px;
       overflow-y: auto;
-    }
-    .toDoTag {
     }
   }
   .footer {

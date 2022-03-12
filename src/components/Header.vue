@@ -6,7 +6,7 @@
       </template>
       <el-icon
         class="menu-icon"
-        size="40px"
+        size="30px"
         color="#5f6368"
         @mouseenter="addMenuFocus($event)"
         @mouseleave="removeMenuFocus($event)"
@@ -18,12 +18,13 @@
     <el-input
       v-model="inputSearch"
       class="w-50 m-2 inputSearch"
-      placeholder="搜索"
+      placeholder="搜索记事"
       icon="el-icon-search"
       type="text"
       clearable
+      @keyup.enter="search"
     >
-     <!--<template #prepend><el-button><el-icon><search /></el-icon></el-button></template>-->
+      <!--<template #prepend><el-button><el-icon><search /></el-icon></el-button></template>-->
     </el-input>
     <el-divider class="el-divider"></el-divider>
   </div>
@@ -57,6 +58,20 @@ export default {
         store.state.isCollapse = false;
       }
     },
+    // 顶部搜索栏
+    search() {
+      store.commit("updateSearchContent", this.inputSearch);
+      const result = store.getters.getSearchToDoLists(this.inputSearch);
+      console.log("结果为:" + result);
+      for (const item of result) {
+        console.log(item);
+      }
+      // const result1 = store.getters.getClickTagToDoList("family");
+      // console.log("结果1为:" + result1);
+      // for (const item1 of result1) {
+      //   console.log(item1);
+      // }
+    },
   },
 };
 </script>
@@ -74,8 +89,8 @@ export default {
     position: absolute;
     top: 50%;
     display: inline-block;
-    height: 40px;
-    line-height: 40px;
+    height: 30px;
+    line-height: 30px;
     margin-top: -20px;
     left: 70px;
   }
@@ -89,7 +104,7 @@ export default {
   .el-divider {
     position: absolute;
     bottom: 0;
-    margin:0
+    margin: 0;
   }
 }
 .focus {
