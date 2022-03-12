@@ -80,6 +80,7 @@
               v-if="isShowDeleteIcon[index]"
               @mouseenter="deleteTagTipVisible[index] = true"
               @mouseleave="removeDeleteIconFocus(index)"
+              @click="deleteTag(index)"
             >
               <el-icon><delete /></el-icon
             ></el-button>
@@ -196,9 +197,20 @@ export default {
     // 修改标签名
     renameTag(index) {
       const oldTagName = this.toDoTags[index].value;
+      let isHaveThisTagName = false;
+      this.toDoTags.forEach((item) => {
+          if (
+            item.value === this.modifyTagNameInput[index] &&
+            this.modifyTagNameInput[index] !== oldTagName
+          ) {
+            isHaveThisTagName = true;
+          }
+      });
       if (this.modifyTagNameInput[index].trim() === "") {
         ElMessage.error("标签名不能为空");
         this.$refs.modifyTagNameInputRef.focus();
+      } else if (isHaveThisTagName) {
+        ElMessage.error("标签名重复");
       } else {
         store.commit("updateToDoTagsOptions", {
           index: index,
