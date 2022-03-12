@@ -188,7 +188,8 @@
               </div>
               <div class="endTime">
                 <div v-if="!isShowDatePicker[index]">
-                  <el-icon><alarm-clock /></el-icon> {{ todoItem.toDoTime
+                  <el-icon v-if="todoItem.toDoTime !== '' && todoItem.toDoTime !== null">
+                    <clock /></el-icon> {{ todoItem.toDoTime
                   }}<el-icon
                     class="edit-todoTime"
                     color="gray"
@@ -228,7 +229,6 @@ export default {
   data() {
     return {
       toDoLists: store.state.toDoLists,
-      isHaveToDo: true,
       inputToDo: "",
       todoStatus: { isCompleted: "", isOutOfTime: "" },
       // 是否展示添加记事对话框
@@ -380,6 +380,13 @@ export default {
     },
   },
   computed: {
+    isHaveToDo() {
+      if (store.state.toDoLists.length !== 0) {
+        return true;
+      } else {
+        return false;
+      }
+    },
     isCompleted(val) {
       if (val === true) return true;
       return false;

@@ -16,10 +16,6 @@
         <el-icon><bell /></el-icon>
         <template #title>提醒</template>
       </el-menu-item>
-      <el-menu-item index="note">
-        <el-icon><document /></el-icon>
-        <template #title>笔记</template>
-      </el-menu-item>
       <div v-for="(item, index) in toDoTagsOptions" :key="index">
         <el-menu-item :index="item.value">
           <el-icon><price-tag /></el-icon>

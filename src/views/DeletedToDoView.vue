@@ -1,19 +1,150 @@
 <template>
-  <div class="contentDiv">
-    <div v-if="isNull" class="noContentDiv">
+  <div class="contentDiv" v-if="isNull">
+    <div class="noContentDiv">
       <!--回收站无内容-->
       <el-icon style="font-size: 50px"><delete /></el-icon>
       <p>回收站中没有任何记事</p>
     </div>
   </div>
+  <div v-else>
+    <!--展示回收站内容-->
+    <el-row>
+      <el-col
+        v-for="(deletedItem, index) in deletedToDoList"
+        :key="deletedItem"
+        :span="6"
+        :offset="index > 0 ? 2 : 0"
+        @mouseenter="getFocus($event, index)"
+        @mouseleave="removeFocus($event)"
+      >
+        <el-card :body-style="{ padding: '0px' }" shadow="hover">
+          <div style="padding: 14px">
+            <div class="header">
+              <h2>{{ deletedItem.title }}</h2>
+            </div>
+            <div class="content">
+              {{ deletedItem.content }}
+            </div>
+            <div class="tag">
+              <el-tag
+                v-for="tag of deletedItem.toDoTags"
+                :key="tag.name"
+                type=""
+                class="mx-1"
+                size="small"
+              >
+                {{ tag.name }}
+              </el-tag>
+            </div>
+            <div class="bottom">
+              <div>
+                <p class="todoTime">{{ deletedItem.toDoTime }}</p>
+                <el-icon
+                  class="alert-icon"
+                  v-if="
+                    deletedItem.toDoTime !== '' && deletedItem.toDoTime !== null
+                  "
+                  ><clock
+                /></el-icon>
+              </div>
+              <div v-show="isShowBottom && currentLi === index">
+                <el-popover
+                  placement="bottom-start"
+                  title=""
+                  :width="150"
+                  trigger="hover"
+                  content="永久删除"
+                >
+                  <template #reference>
+                    <el-button
+                      class="button-icon"
+                      size="small"
+                      circle
+                      @click="foreverDelete(index)"
+                    >
+                      <el-icon
+                        ><delete-filled
+                      /></el-icon> </el-button></template
+                ></el-popover>
+                <el-popover
+                  placement="bottom-start"
+                  title=""
+                  :width="150"
+                  trigger="hover"
+                  content="还原"
+                >
+                  <template #reference
+                    ><el-button
+                      class="button-icon"
+                      size="small"
+                      circle
+                       @click="reset(index)"
+                    >
+                    <el-icon
+                      ><sell
+                    /></el-icon> </el-button></template
+                ></el-popover>
+              </div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+  </div>
 </template>
 <script>
+import store from "@/store/index.js";
+import { ElMessage } from "element-plus";
 export default {
   name: "DeletedToDoView",
   data() {
     return {
-      isNull: true,
+      isShowBottom: false,
+      currentLi: 0,
     };
+  },
+  store,
+  computed: {
+    isNull() {
+      if (store.state.deletedToDoLists.length !== 0) {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    deletedToDoList() {
+      return store.state.deletedToDoLists;
+    },
+  },
+  methods: {
+    getFocus($event, index) {
+      this.isShowBottom = true;
+      this.currentLi = index;
+    },
+    removeFocus() {
+      this.isShowBottom = false;
+      this.currentLi = null;
+    },
+    // 还原
+    reset(index) {
+      store.commit("resetToDoFromRush", { index: index });
+      ElMessage({
+        message: "记事已还原",
+        center: true,
+        type: "success",
+        // offset: 150
+      });
+    },
+    // 永久删除
+    foreverDelete(index) {
+      store.commit("foreverDelete", { index: index });
+      ElMessage({
+        message: "记事已永久删除",
+        center: true,
+        type: "success",
+        // offset: 150
+      });
+    },
   },
 };
 </script>
@@ -32,5 +163,24 @@ export default {
   width: 100%;
   top: 70%;
   margin-top: -250px;
+}
+.button-icon {
+  margin-right: 1px;
+}
+.el-tag {
+  margin-right: 10px;
+}
+.todoTime {
+  float: right;
+  font-size: 14px;
+}
+.alert-icon {
+  float: right;
+}
+.header,
+.content,
+.tag,
+.bottom {
+  margin-bottom: 10px;
 }
 </style>
