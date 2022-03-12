@@ -19,7 +19,7 @@ export default createStore({
         isCompleted: false,
         isOutOfTime: false,
         // 标签
-        toDoTags: [{ name: 'school' }, { name: 'famiy' }, { name: '生活' }, { name: '前端' }]
+        toDoTags: [{ name: 'school' }, { name: 'family' }, { name: '生活' }, { name: '前端' }]
       },
       {
         title: "记事2",
@@ -118,6 +118,10 @@ export default createStore({
     updateToDoTagsOptions(state, playload) {
       state.toDoTagsOptions[playload.index].value = playload.value
       state.toDoTagsOptions[playload.index].label = playload.value
+    },
+    // 删除标签
+    deleteToDoTagsOptions(state, playload) {
+      state.toDoTagsOptions.splice(playload.index, 1)
     }
   },
   actions: {

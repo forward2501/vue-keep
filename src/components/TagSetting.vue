@@ -128,7 +128,7 @@
   </el-dialog>
 </template>
 <script>
-import { ElMessage } from "element-plus";
+import { ElMessageBox, ElMessage } from "element-plus";
 import store from "@/store/index.js";
 export default {
   name: "TagSetting",
@@ -199,12 +199,12 @@ export default {
       const oldTagName = this.toDoTags[index].value;
       let isHaveThisTagName = false;
       this.toDoTags.forEach((item) => {
-          if (
-            item.value === this.modifyTagNameInput[index] &&
-            this.modifyTagNameInput[index] !== oldTagName
-          ) {
-            isHaveThisTagName = true;
-          }
+        if (
+          item.value === this.modifyTagNameInput[index] &&
+          this.modifyTagNameInput[index] !== oldTagName
+        ) {
+          isHaveThisTagName = true;
+        }
       });
       if (this.modifyTagNameInput[index].trim() === "") {
         ElMessage.error("标签名不能为空");
@@ -245,6 +245,40 @@ export default {
       }
       this.isShowEditIcon[index] = false;
       this.renameTagTipVisible[index] = false;
+    },
+    // 删除标签
+    deleteTag(index) {
+      ElMessageBox.confirm(
+        "我们将删除此标签并将其从您所有的 Keep 记事中移除。您的记事不会被删除。",
+        "提示",
+        {
+          confirmButtonText: "删除",
+          cancelButtonText: "取消",
+          type: "info",
+        }
+      )
+        .then(() => {
+          const deleteTagName = this.toDoTags[index].value;
+          store.commit("deleteToDoTagsOptions", { index: index });
+          // 从相关记事中移除该标签
+          store.state.toDoLists.forEach((item1) => {
+            item1.toDoTags.forEach((item2, index) => {
+              if (item2.name === deleteTagName) {
+                item1.toDoTags.splice(index, 1);
+              }
+            });
+          });
+          ElMessage({
+            type: "success",
+            message: "标签已删除",
+          });
+        })
+        .catch(() => {
+          ElMessage({
+            type: "info",
+            message: "取消删除",
+          });
+        });
     },
   },
   computed: {
