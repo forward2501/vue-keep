@@ -195,6 +195,7 @@ export default {
     },
     // 修改标签名
     renameTag(index) {
+      const oldTagName = this.toDoTags[index].value;
       if (this.modifyTagNameInput[index].trim() === "") {
         ElMessage.error("标签名不能为空");
         this.$refs.modifyTagNameInputRef.focus();
@@ -205,6 +206,14 @@ export default {
         });
         this.isShowEditIcon[index] = true;
         this.renameTagTipVisible[index] = false;
+        // 更新有该标签的记事中的标签名
+        store.state.toDoLists.forEach((item1) => {
+          item1.toDoTags.forEach((item2) => {
+            if (item2.name === oldTagName) {
+              item2.name = this.modifyTagNameInput[index];
+            }
+          });
+        });
         ElMessage({
           type: "success",
           message: "标签重命名成功",
