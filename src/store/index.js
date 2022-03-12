@@ -110,6 +110,15 @@ export default createStore({
     foreverDelete(state, playload) {
       state.deletedToDoLists.splice(playload.index, 1)
     },
+    // 创建新标签
+    addNewTag(state, playload) {
+      state.toDoTagsOptions.push(playload);
+    },
+    // 更新标签名
+    updateToDoTagsOptions(state, playload) {
+      state.toDoTagsOptions[playload.index].value = playload.value
+      state.toDoTagsOptions[playload.index].label = playload.value
+    }
   },
   actions: {
   },
