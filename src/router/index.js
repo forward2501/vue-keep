@@ -19,10 +19,10 @@ const routes = [
         component: TodoListView
       },
       {
-        path: '/note',
-        name: 'note',
+        path: '/notifyToDo',
+        name: 'notifyToDo',
         // 懒加载
-        component: () => import(/* webpackChunkName: "about" */ '../views/NoteView.vue'),
+        component: () => import(/* webpackChunkName: "about" */ '../views/NotifyToDoView.vue'),
         // component: NoteView
       },
       {

@@ -57,9 +57,16 @@ export default createStore({
       },
     ],
     // 已被删除的记事
-    deletedToDoLists: []
+    deletedToDoLists: [],
+    // 需要提醒的记事
+    // notifyToDoLosts: []
   },
   getters: {
+    notifyToDoLosts(state) { // 需要提醒的记事，在toDoLists中进行过滤
+      return state.toDoLists.filter(function (todo) {
+        return todo.toDoTime !== '' && todo.toDoTime !== null
+      })
+    }
   },
   mutations: {
     updateCurrentMenu(state, menuName) {
@@ -93,7 +100,16 @@ export default createStore({
       // 往回收站写入被删除的记事
       state.deletedToDoLists.push(deleteTodo[0]);
       console.log("回收站:" + state.deletedToDoLists[0].title);
-    }
+    },
+    // 从回收站还原
+    resetToDoFromRush(state, playload) {
+      const val = state.deletedToDoLists.splice(playload.index, 1)
+      state.toDoLists.push(val[0]);
+    },
+    // 从回收站永久删除
+    foreverDelete(state, playload) {
+      state.deletedToDoLists.splice(playload.index, 1)
+    },
   },
   actions: {
   },
