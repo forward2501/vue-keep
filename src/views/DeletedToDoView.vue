@@ -7,6 +7,9 @@
     </div>
   </div>
   <div v-else>
+    <el-button type="text" style="float: right" @click="clearAllDeletedTo"
+      >清空回收站</el-button
+    >
     <!--展示回收站内容-->
     <el-row>
       <el-col
@@ -78,11 +81,9 @@
                       class="button-icon"
                       size="small"
                       circle
-                       @click="reset(index)"
+                      @click="reset(index)"
                     >
-                    <el-icon
-                      ><sell
-                    /></el-icon> </el-button></template
+                      <el-icon><sell /></el-icon> </el-button></template
                 ></el-popover>
               </div>
             </div>
@@ -94,7 +95,7 @@
 </template>
 <script>
 import store from "@/store/index.js";
-import { ElMessage } from "element-plus";
+import { ElMessageBox, ElMessage } from "element-plus";
 export default {
   name: "DeletedToDoView",
   data() {
@@ -132,7 +133,6 @@ export default {
         message: "记事已还原",
         center: true,
         type: "success",
-        // offset: 150
       });
     },
     // 永久删除
@@ -142,8 +142,32 @@ export default {
         message: "记事已永久删除",
         center: true,
         type: "success",
-        // offset: 150
       });
+    },
+    // 清空回收站
+    clearAllDeletedTo() {
+      ElMessageBox.confirm(
+        "要清空回收站吗？此操作会永久删除回收站中的所有记事",
+        "提示",
+        {
+          confirmButtonText: "清空回收站",
+          cancelButtonText: "取消",
+          type: "info",
+        }
+      )
+        .then(() => {
+          store.commit("clearAllDelete");
+          ElMessage({
+            type: "success",
+            message: "回收站已清空",
+          });
+        })
+        .catch(() => {
+          ElMessage({
+            type: "info",
+            message: "取消清空",
+          });
+        });
     },
   },
 };

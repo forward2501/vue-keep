@@ -122,6 +122,10 @@ export default createStore({
     foreverDelete(state, playload) {
       state.deletedToDoLists.splice(playload.index, 1)
     },
+    // 清空回收站
+    clearAllDelete(state) {
+      state.deletedToDoLists = [];
+    },
     // 创建新标签
     addNewTag(state, playload) {
       state.toDoTagsOptions.push(playload);
