@@ -110,7 +110,9 @@
               <div class="timeDiv">
                 <div v-if="!isShowDatePicker[index]">
                   <el-icon
-                    v-if="todoItem.toDoTime !== ''"
+                    v-if="
+                      todoItem.toDoTime !== '' && todoItem.toDoTime !== null
+                    "
                     size="small"
                     class="clock"
                     ><clock
@@ -157,6 +159,7 @@
                   :shortcuts="shortcuts"
                   value-format="YYYY-MM-DD hh:mm:ss"
                   size="small"
+                  clearable
                   @change="timeChange(toDoTime, index)"
                 >
                 </el-date-picker>
@@ -266,6 +269,8 @@ export default {
       selectVisible: [],
       editToDoDialogVisible: false,
       toDoTime: "",
+      // toDoTime: this.toDoTimeFun(),
+      // defaultToDoTime: this.defaultToDoTimeFun(),
       shortcuts: [
         {
           text: "Today",
@@ -301,6 +306,7 @@ export default {
       this.isShowFooter = false;
       this.currentLi = null;
     },
+    // 给记事新增标签
     updateToDoListTag(index, tagObj) {
       // store.commit("updateToDoListTag", { index: index, tagObj: tagObj });
       this.toDoLists[index].toDoTags.push(tagObj);
@@ -351,6 +357,7 @@ export default {
     editToDoList(index) {
       this.editToDoDialogVisible = true;
       this.currentLi = index;
+      // alert("点击编辑记事" + index);
     },
     // 监听子组件事件之后的处理函数
     closeEditDialog(data) {
@@ -371,6 +378,7 @@ export default {
     editToDoTime(index) {
       // alert("修改todoTime");
       this.isShowDatePicker[index] = true;
+      this.currentLi = index;
     },
     // 时间选择器选择改变
     timeChange(value, index) {
@@ -380,12 +388,22 @@ export default {
       // });
       this.toDoLists[index].toDoTime = value;
       this.isShowDatePicker[index] = false;
-      ElMessage({
-        message: "修改提醒时间成功",
-        center: true,
-        type: "success",
-        // offset: 150
-      });
+      if (value === "" || value === null) {
+        // 删除提醒时间
+        ElMessage({
+          message: "已从提醒中移除",
+          center: true,
+          type: "success",
+          // offset: 150
+        });
+      } else {
+        ElMessage({
+          message: "修改提醒时间成功",
+          center: true,
+          type: "success",
+          // offset: 150
+        });
+      }
     },
     // 完成记事
     completeToDo(index) {
@@ -403,8 +421,20 @@ export default {
     },
     // 删除记事
     deleteToDo(index) {
-      store.commit("deleteToDo", { index: index });
-      // this.toDoLists.splice(index, 1);
+      // store.commit("deleteToDo", { index: index });
+      // store.state.toDoLists.forEach((item, itemIndex) => {
+      //   if (item === this.toDoLists[index]) {
+      //     store.state.toDoLists.splice(itemIndex, 1);
+      //   }
+      // });
+      const deleteItem = this.toDoLists.splice(index, 1);
+      store.state.toDoLists.forEach((item, itemIndex) => {
+        if (item === deleteItem[0]) {
+          store.state.toDoLists.splice(itemIndex, 1);
+        }
+      });
+      // 往回收站写入数据
+      store.commit("addDeletedToDoList", { value: deleteItem[0] });
       ElMessage({
         message: "记事已删除",
         center: true,
@@ -416,6 +446,16 @@ export default {
       this.addToDoDialogVisible = true;
       this.$refs.addToDoInputRef.blur();
     },
+    // toDoTimeFun() {
+    //   return this.toDoLists[this.currentLi].toDoTime !== null
+    //     ? this.toDoLists[this.currentLi].toDoTime
+    //     : "";
+    // },
+    // defaultToDoTimeFun() {
+    //   return new Date(this.toDoLists[this.currentLi].toDoTime) !== null
+    //     ? new Date(this.toDoLists[this.currentLi].toDoTime)
+    //     : "";
+    // },
   },
   computed: {
     toDoLists() {
@@ -432,12 +472,23 @@ export default {
     toDoTagsOptions() {
       return store.state.toDoTagsOptions;
     },
+    // defaultToDoTime() {
+    //   new Date(this.toDoLists[this.currentLi].toDoTime);
+    // },
   },
   mounted() {
     this.toDoLists.forEach((item) => {
       this.selectVisible.push(false);
       this.isShowDatePicker.push(false);
     });
+    // this.toDoTime =
+    //   this.toDoLists[this.currentLi].toDoTime !== null
+    //     ? this.toDoLists[this.currentLi].toDoTime
+    //     : "";
+    // this.defaultToDoTime =
+    //   new Date(this.toDoLists[this.currentLi].toDoTime) !== null
+    //     ? new Date(this.toDoLists[this.currentLi].toDoTime)
+    //     : "";
   },
 };
 </script>
