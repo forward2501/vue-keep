@@ -111,7 +111,11 @@ export default createStore({
       const deleteTodo = state.toDoLists.splice(playload.index, 1)
       // 往回收站写入被删除的记事
       state.deletedToDoLists.push(deleteTodo[0]);
-      console.log("回收站:" + state.deletedToDoLists[0].title);
+      // console.log("回收站:" + state.deletedToDoLists[0].title);
+    },
+    // 从回收站写入数据
+    addDeletedToDoList(state, playload) {
+      state.deletedToDoLists.push(playload.value);
     },
     // 从回收站还原
     resetToDoFromRush(state, playload) {

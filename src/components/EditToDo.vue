@@ -97,44 +97,20 @@ export default {
           },
         },
       ],
-      toDoFormModel: {
-        toDoTitle: this.getDefaultTitle(),
-        toDoContent: this.getDefaultContent(),
-        toDoTime: this.getDefaultTime(),
-        tagValue: this.getDefaultTags(),
-      },
       toDoRules: {
         toDoContent: [
           { required: true, message: "Please input content", trigger: "blur" },
         ],
       },
       formSize: "",
-      defaultToDoTime: this.getDefaultTime(),
+      toDoFormModel: {},
+      defaultToDoTime: "",
+      arr: []
     };
   }, // data
   props: ["toDoIndex"],
   store,
   methods: {
-    getDefaultTitle() {
-      return store.state.toDoLists[this.toDoIndex].title;
-      // return this.toDoLists[this.toDoIndex].title;
-    },
-    getDefaultContent() {
-      return store.state.toDoLists[this.toDoIndex].content;
-      // return this.toDoLists[this.toDoIndex].content;
-    },
-    getDefaultTime() {
-      return new Date(store.state.toDoLists[this.toDoIndex].toDoTime);
-      // return new Date(this.toDoLists[this.toDoIndex].toDoTime);
-    },
-    getDefaultTags() {
-      const tagArr1 = store.state.toDoLists[this.toDoIndex].toDoTags;
-      const tagArr2 = [];
-      for (const item of tagArr1) {
-        tagArr2.push(item.name);
-      }
-      return tagArr2;
-    },
     // 提交修改
     submitUpdateToDoForm() {
       if (!this.$refs.editToDoFormRef) {
@@ -156,9 +132,16 @@ export default {
             isOutOfTime: false,
             toDoTags: toDoTags,
           };
-          store.commit("updateToDoList", {
-            index: this.toDoIndex,
-            toDoObj: toDoObj,
+          // store.commit("updateToDoList", {
+          //   index: this.toDoIndex,
+          //   toDoObj: toDoObj,
+          // });
+          const oldValue = this.toDoLists[this.toDoIndex];
+          this.toDoLists.splice(this.toDoIndex, 1, toDoObj);
+          store.state.toDoLists.forEach((item, itemIndex) => {
+            if (item === oldValue) {
+              store.state.toDoLists.splice(itemIndex, 1, toDoObj);
+            }
           });
           // this.toDoLists.splice(this.toDoIndex, 1, toDoObj);
           // 添加成功之后的提示框
@@ -191,6 +174,27 @@ export default {
     toDoTagsOptions() {
       return store.state.toDoTagsOptions;
     },
+    toDoLists() {
+      return store.getters.getSearchToDoLists(store.state.searchContent);
+    },
+    getDefaultTags() {
+      const tagArr1 = this.toDoLists[this.toDoIndex].toDoTags;
+      const tagArr2 = [];
+      for (const item of tagArr1) {
+        tagArr2.push(item.name);
+      }
+      return tagArr2;
+    },
+  },
+  mounted() {
+    this.toDoFormModel = {
+      toDoTitle: this.toDoLists[this.toDoIndex].title,
+      toDoContent: this.toDoLists[this.toDoIndex].content,
+      toDoTime: this.toDoLists[this.toDoIndex].toDoTime,
+      tagValue: this.getDefaultTags
+    };
+
+    this.defaultToDoTime = new Date(this.toDoLists[this.toDoIndex].toDoTime);
   },
 };
 </script>

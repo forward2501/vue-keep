@@ -21,14 +21,14 @@
         <el-card :body-style="{ padding: '0px' }" shadow="hover">
           <div style="padding: 14px">
             <div class="header" style="overflow: hidden">
-              <h2 style="float:left">{{ notifyItem.title }}</h2>
+              <h2 style="float: left">{{ notifyItem.title }}</h2>
               <el-button
-                  circle
-                  style="float: right; border: none"
-                  v-show="notifyItem.isCompleted === true"
-                >
-                  <el-icon><finished /></el-icon>
-                </el-button>
+                circle
+                style="float: right; border: none"
+                v-show="notifyItem.isCompleted === true"
+              >
+                <el-icon><finished /></el-icon>
+              </el-button>
             </div>
             <div class="content">
               {{ notifyItem.content }}
@@ -124,6 +124,7 @@
                   :shortcuts="shortcuts"
                   value-format="YYYY-MM-DD hh:mm:ss"
                   size="small"
+                  clearable
                   @change="timeChange(toDoTime, index)"
                 >
                 </el-date-picker>
@@ -201,7 +202,8 @@ export default {
       this.isShowFooter = false;
     },
     updateToDoListTag(index, tagObj) {
-      store.commit("updateToDoListTag", { index: index, tagObj: tagObj });
+      // store.commit("updateToDoListTag", { index: index, tagObj: tagObj });
+      this.notifyToDoLosts[index].toDoTags.push(tagObj);
     },
     handleClose(name) {
       this.notifyToDoLosts[this.currentLi].toDoTags.forEach((item) => {
@@ -260,10 +262,11 @@ export default {
       this.isShowDatePicker[index] = true;
     },
     timeChange(value, index) {
-      store.commit("updateToDoTime", {
-        index: index,
-        toDoTime: value,
-      });
+      // store.commit("updateToDoTime", {
+      //   index: index,
+      //   toDoTime: value,
+      // });
+      this.notifyToDoLosts[index].toDoTime = value;
       this.isShowDatePicker[index] = false;
       if (value === "" || value === null) {
         // 删除提醒时间

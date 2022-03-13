@@ -117,7 +117,14 @@
                   >
                     {{ filterTagItem.toDoTime }}
                   </p>
-                  <el-icon class="alert-icon"><clock /></el-icon>
+                  <el-icon
+                    v-if="
+                      filterTagItem.toDoTime !== '' &&
+                      filterTagItem.toDoTime !== null
+                    "
+                    class="alert-icon"
+                    ><clock
+                  /></el-icon>
                 </div>
                 <el-date-picker
                   v-if="isShowDatePicker[index]"
@@ -207,7 +214,8 @@ export default {
       this.isShowFooter = false;
     },
     updateToDoListTag(index, tagObj) {
-      store.commit("updateToDoListTag", { index: index, tagObj: tagObj });
+      // store.commit("updateToDoListTag", { index: index, tagObj: tagObj });
+      this.filterTagToDoLists[index].toDoTags.push(tagObj);
     },
     handleClose(name) {
       this.filterTagToDoLists[this.currentLi].toDoTags.forEach((item) => {
@@ -266,10 +274,11 @@ export default {
       this.isShowDatePicker[index] = true;
     },
     timeChange(value, index) {
-      store.commit("updateToDoTime", {
-        index: index,
-        toDoTime: value,
-      });
+      // store.commit("updateToDoTime", {
+      //   index: index,
+      //   toDoTime: value,
+      // });
+      this.filterTagToDoLists[index].toDoTime = value;
       this.isShowDatePicker[index] = false;
       if (value === "" || value === null) {
         // 删除提醒时间
