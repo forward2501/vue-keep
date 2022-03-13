@@ -117,12 +117,15 @@ export default {
   methods: {
     getDefaultTitle() {
       return store.state.toDoLists[this.toDoIndex].title;
+      // return this.toDoLists[this.toDoIndex].title;
     },
     getDefaultContent() {
       return store.state.toDoLists[this.toDoIndex].content;
+      // return this.toDoLists[this.toDoIndex].content;
     },
     getDefaultTime() {
       return new Date(store.state.toDoLists[this.toDoIndex].toDoTime);
+      // return new Date(this.toDoLists[this.toDoIndex].toDoTime);
     },
     getDefaultTags() {
       const tagArr1 = store.state.toDoLists[this.toDoIndex].toDoTags;
@@ -157,6 +160,7 @@ export default {
             index: this.toDoIndex,
             toDoObj: toDoObj,
           });
+          // this.toDoLists.splice(this.toDoIndex, 1, toDoObj);
           // 添加成功之后的提示框
           ElMessage({
             message: "修改记事成功",

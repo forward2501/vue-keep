@@ -66,7 +66,8 @@ export default {
       for (const item of result) {
         console.log(item);
       }
-      // const result1 = store.getters.getClickTagToDoList("family");
+      // const result1 = store.getters.getClickTagToDoList("school");
+      // alert(result1[0].title)
       // console.log("结果1为:" + result1);
       // for (const item1 of result1) {
       //   console.log(item1);

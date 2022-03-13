@@ -1,5 +1,5 @@
 <template>
-  <div>这是标签设置页</div>
+  <div class="tagView"></div>
   <TagSetting :isShowTagSetting="isShowTagSetting"></TagSetting>
 </template>
 <script>
@@ -9,19 +9,26 @@ export default {
   name: "TagSettingView",
   components: { TagSetting },
   data() {
-    return {};
+    return {
+      isShowDialog: false,
+    };
   },
   store,
   computed: {
     isShowTagSetting() {
-      if (store.state.currentMenu === "tagSetting") {
+      if (store.state.currentMenu === "/tagSetting") {
         return true;
       } else {
         return false;
       }
     },
   },
+  methods: {},
 };
 </script>
 <style lang="scss" scoped>
+.tagView {
+  width: 100%;
+  height: 100%;
+}
 </style>

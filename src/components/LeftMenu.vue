@@ -8,25 +8,25 @@
       :router="true"
       @select="select"
     >
-      <el-menu-item index="todo">
+      <el-menu-item index="/todo">
         <el-icon><list /></el-icon>
         <template #title>记事</template>
       </el-menu-item>
-       <el-menu-item index="notifyToDo">
+      <el-menu-item index="/notifyToDo">
         <el-icon><bell /></el-icon>
         <template #title>提醒</template>
       </el-menu-item>
       <div v-for="(item, index) in toDoTagsOptions" :key="index">
-        <el-menu-item :index="item.value">
+        <el-menu-item :index="tag(index)" @click="getMenuName(item.value)">
           <el-icon><price-tag /></el-icon>
-          <template #title>{{item.value}}</template>
+          <template #title>{{ item.value }}</template>
         </el-menu-item>
       </div>
-       <el-menu-item index="tagSetting">
+      <el-menu-item index="/tagSetting" @click="clickUpdateTagMenu">
         <el-icon><edit-pen /></el-icon>
         <template #title>修改标签</template>
       </el-menu-item>
-      <el-menu-item index="deletedToDo">
+      <el-menu-item index="/deletedToDo">
         <el-icon><delete /></el-icon>
         <template #title>回收站</template>
       </el-menu-item>
@@ -56,10 +56,22 @@ export default {
     // 菜单切换事件，selec是回调函数
     select: function (index, indexPath, item, routeResult) {
       console.log("当前选中菜单:" + index + ",路径:" + indexPath);
+      // if (index === "tagSetting") {
+      //   index = "todo";
+      // }
       store.commit("updateCurrentMenu", index);
-      // 点击menu选项之后折叠menu
-      // store.commit("updateIsCollapse", false);
-      // console.log("折叠菜单");
+    },
+    //  clickUpdateTagMenu()
+    // clickUpdateTagMenu() {
+    //   store.commit("updateCurrentMenu", "todo");
+    //   // 让修改对话框出来
+    //   store.commit("updateShowUpdateTagMenu", { status: true });
+    // },
+    tag(index) {
+      return "/tag/" + index;
+    },
+    getMenuName(value) {
+      store.commit("updateCurrentFilterTagName", value);
     },
   },
 };

@@ -41,7 +41,10 @@
             </div>
             <div class="bottom">
               <div>
-                <p class="todoTime">{{ deletedItem.toDoTime }}</p>
+                <p class="todoTime" :class="(new Date(deletedItem.toDoTime).getTime() <
+                      new Date().getTime())?'line-through':''">
+                    {{ deletedItem.toDoTime }}
+                </p>
                 <el-icon
                   class="alert-icon"
                   v-if="
@@ -206,5 +209,9 @@ export default {
 .tag,
 .bottom {
   margin-bottom: 10px;
+}
+.line-through {
+  text-decoration: line-through;
+  color: gray;
 }
 </style>
