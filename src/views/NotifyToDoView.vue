@@ -13,14 +13,22 @@
         v-for="(notifyItem, index) in notifyToDoLosts"
         :key="notifyItem"
         :span="6"
+        class="el-col-style"
         :offset="index > 0 ? 2 : 0"
         @mouseenter="getFocus($event, index)"
         @mouseleave="removeFocus($event)"
       >
         <el-card :body-style="{ padding: '0px' }" shadow="hover">
           <div style="padding: 14px">
-            <div class="header">
-              <h2>{{ notifyItem.title }}</h2>
+            <div class="header" style="overflow: hidden">
+              <h2 style="float:left">{{ notifyItem.title }}</h2>
+              <el-button
+                  circle
+                  style="float: right; border: none"
+                  v-show="notifyItem.isCompleted === true"
+                >
+                  <el-icon><finished /></el-icon>
+                </el-button>
             </div>
             <div class="content">
               {{ notifyItem.content }}
@@ -32,6 +40,9 @@
                 type=""
                 class="mx-1"
                 size="small"
+                closable
+                :disable-transitions="false"
+                @close="handleClose(tag.name)"
               >
                 {{ tag.name }}
               </el-tag>
@@ -48,7 +59,7 @@
                 <template #reference>
                   <el-button
                     size="small"
-                    style="margin-left: 10px; margin-top: 2px"
+                    style="margin-top: 2px; border: none"
                     @click="selectVisible[index] = true"
                     ><el-icon><plus /></el-icon
                   ></el-button> </template
@@ -75,14 +86,35 @@
             <div class="bottom">
               <div>
                 <div v-if="!isShowDatePicker[index]">
-                  <el-icon
-                    class="edit-todoTime"
-                    color="gray"
-                    v-show="isShowFooter && currentLi === index"
-                    @click="editToDoTime(index)"
-                    ><edit-pen
-                  /></el-icon>
-                  <p class="todoTime">{{ notifyItem.toDoTime }}</p>
+                  <el-popover
+                    placement="bottom-start"
+                    title=""
+                    :width="150"
+                    trigger="hover"
+                    content="修改时间"
+                  >
+                    <template #reference>
+                      <el-button
+                        v-show="isShowFooter && currentLi === index"
+                        circle
+                        style="border: none; margin-top: -3px"
+                        size="small"
+                        class="edit-todoTime"
+                      >
+                        <el-icon color="gray" @click="editToDoTime(index)"
+                          ><edit-pen /></el-icon></el-button></template
+                  ></el-popover>
+                  <p
+                    class="todoTime"
+                    :class="
+                      new Date(notifyItem.toDoTime).getTime() <
+                      new Date().getTime()
+                        ? 'line-through'
+                        : ''
+                    "
+                  >
+                    {{ notifyItem.toDoTime }}
+                  </p>
                   <el-icon class="alert-icon"><clock /></el-icon>
                 </div>
                 <el-date-picker
@@ -96,8 +128,7 @@
                 >
                 </el-date-picker>
               </div>
-              <div v-show="isShowBottom && currentLi === index">
-              </div>
+              <div v-show="isShowBottom && currentLi === index"></div>
             </div>
           </div>
         </el-card>
@@ -166,41 +197,63 @@ export default {
       this.isShowFooter = true;
     },
     removeFocus($event) {
-      this.currentLi = 0;
+      this.currentLi = null;
       this.isShowFooter = false;
     },
     updateToDoListTag(index, tagObj) {
       store.commit("updateToDoListTag", { index: index, tagObj: tagObj });
     },
+    handleClose(name) {
+      this.notifyToDoLosts[this.currentLi].toDoTags.forEach((item) => {
+        if (name === item.name) {
+          this.notifyToDoLosts[this.currentLi].toDoTags.splice(
+            this.notifyToDoLosts[this.currentLi].toDoTags.indexOf(item),
+            1
+          );
+        }
+      });
+    },
     change(val, index) {
       // alert("当前选择:" + val);
-      ElMessageBox.confirm(
-        "当前选择新增标签为:" + val + "，确认新增?",
-        "提示",
-        {
-          confirmButtonText: "确认",
-          cancelButtonText: "取消",
-          type: "info",
-        }
-      )
-        .then(() => {
-          // 新增标签逻辑
-          const tagObj = { name: val };
-          this.updateToDoListTag(index, tagObj);
-          this.selectVisible[index] = false;
-          ElMessage({
-            type: "success",
-            message: "新增标签成功",
-          });
-        })
-        .catch(() => {
-          // 新增失败
-          this.selectVisible[index] = false;
+      let isFlag = false;
+      this.notifyToDoLosts[index].toDoTags.forEach((item) => {
+        if (val === item.name) {
+          isFlag = true;
           ElMessage({
             type: "error",
-            message: "取消新增",
+            message: "不能新增已有的标签",
           });
-        });
+        }
+      });
+      if (!isFlag) {
+        ElMessageBox.confirm(
+          "当前选择新增标签为:" + val + "，确认新增?",
+          "提示",
+          {
+            confirmButtonText: "确认",
+            cancelButtonText: "取消",
+            type: "info",
+          }
+        )
+          .then(() => {
+            // 新增标签逻辑
+            const tagObj = { name: val };
+            this.updateToDoListTag(index, tagObj);
+            this.selectVisible[index] = false;
+            ElMessage({
+              type: "success",
+              message: "新增标签成功",
+            });
+          })
+          .catch(() => {
+            // 新增失败
+            this.selectVisible[index] = false;
+            ElMessage({
+              type: "error",
+              message: "取消新增",
+            });
+          });
+      }
     }, // change
     editToDoTime(index) {
       // alert("修改todoTime");
@@ -281,5 +334,12 @@ export default {
 .tagSelect {
   width: 100px;
   margin-top: 5px;
+}
+.line-through {
+  text-decoration: line-through;
+  color: gray;
+}
+.el-col-style {
+  margin-top: 10px;
 }
 </style>
