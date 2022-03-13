@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!--添加记事搜索框-->
     <el-input
       ref="addToDoInputRef"
       v-model="inputToDo"
@@ -9,15 +10,7 @@
       type="text"
       @click="clickAddToDo"
     ></el-input>
-    <!-- <el-button
-      type="text"
-      class="inputToDoButton"
-      @click="addToDoDialogVisible = true"
-    >
-      添加记事
-      <el-icon><plus /></el-icon>
-    </el-button> -->
-    <!--对话框-->
+    <!--添加记事对话框-->
     <el-dialog
       v-model="addToDoDialogVisible"
       :title="addToDoDialogTitle"
@@ -31,51 +24,44 @@
       </template>
     </el-dialog>
     <!---->
-    <!--如果没有未完成的待办-->
-    <div class="allCompleted" v-if="!isHaveToDo">暂无待办...</div>
-    <!--如果有未完成的待办-->
-    <div class="todoListsDiv" v-if="isHaveToDo">
-      <ul>
-        <li
-          class="toListItem"
+    <!--记事为空-->
+    <div class="isNullDiv" v-if="!isHaveToDo">暂无记事...</div>
+    <!--记事不为空-->
+    <!--改成卡片布局-->
+    <div class="isNotNullDiv" v-if="isHaveToDo">
+      <el-row>
+        <el-col
           v-for="(todoItem, index) in toDoLists"
           :key="index"
+          class="el-col-style"
+          :span="6"
+          :offset="index > 0 ? 2 : 0"
           @mouseenter="getFocus($event, index)"
           @mouseleave="removeFocus($event)"
         >
-          <el-container class="container">
-            <el-header class="todoItemHeader"
-              ><h2>
-                {{ todoItem.title }}
+          <el-card :body-style="{ padding: '0px' }" shadow="hover">
+            <div style="padding: 14px">
+              <div class="header" style="overflow: hidden">
+                <h2 style="float: left">{{ todoItem.title }}</h2>
                 <el-button
-                  class="todoStatus"
-                  type="success"
                   circle
-                  v-if="todoItem.isCompleted"
+                  style="float: right; border: none"
+                  v-show="todoItem.isCompleted === true"
                 >
                   <el-icon><finished /></el-icon>
                 </el-button>
-                <el-button
-                  class="todoStatus"
-                  type="danger"
-                  circle
-                  v-else-if="!todoItem.isCompleted && todoItem.isOutOfTime"
-                >
-                  <el-icon><failed /></el-icon>
-                </el-button>
-                <span class="todoStatus" v-else> </span>
-              </h2>
-            </el-header>
-            <el-main class="todoItemContent">
-              <div class="content">{{ todoItem.content }}</div>
-              <div class="toDoTag">
+              </div>
+              <div class="content">
+                {{ todoItem.content }}
+              </div>
+              <div class="tag">
                 <el-tag
                   v-for="tag of todoItem.toDoTags"
                   :key="tag.name"
                   type=""
                   class="mx-1"
-                  closable
                   size="small"
+                  closable
                   :disable-transitions="false"
                   @close="handleClose(tag.name)"
                 >
@@ -94,12 +80,12 @@
                   <template #reference>
                     <el-button
                       size="small"
-                      style="margin-left: 10px; margin-top: 2px"
+                      style="margin-left: 5px; margin-top: 2px; border: none"
                       @click="selectVisible[index] = true"
                       ><el-icon><plus /></el-icon
                     ></el-button> </template
                 ></el-popover>
-                <!--标签选择框-->
+                <!-- 标签选择器-->
                 <el-select
                   v-model="tagValue"
                   v-if="selectVisible[index]"
@@ -118,8 +104,63 @@
                   </el-option>
                 </el-select>
               </div>
-            </el-main>
-            <el-footer class="footer">
+              <!--tag-->
+            </div>
+            <div class="bottom">
+              <div class="timeDiv">
+                <div v-if="!isShowDatePicker[index]">
+                  <el-icon
+                    v-if="todoItem.toDoTime !== ''"
+                    size="small"
+                    class="clock"
+                    ><clock
+                  /></el-icon>
+                  <span
+                    class="todoTime"
+                    :class="
+                      new Date(todoItem.toDoTime).getTime() <
+                      new Date().getTime()
+                        ? 'line-through'
+                        : ''
+                    "
+                  >
+                    {{ todoItem.toDoTime }}
+                  </span>
+                  <el-popover
+                    placement="bottom-start"
+                    title=""
+                    :width="150"
+                    trigger="hover"
+                    content="修改时间"
+                  >
+                    <template #reference>
+                      <el-button
+                        circle
+                        size="small"
+                        style="border: none"
+                        v-show="isShowFooter && currentLi === index"
+                      >
+                        <el-icon
+                          class="edit-todoTime"
+                          color="gray"
+                          size="small"
+                          @click="editToDoTime(index)"
+                          ><edit-pen /></el-icon
+                      ></el-button>
+                    </template>
+                  </el-popover>
+                </div>
+                <el-date-picker
+                  v-if="isShowDatePicker[index]"
+                  v-model="toDoTime"
+                  type="datetime"
+                  :shortcuts="shortcuts"
+                  value-format="YYYY-MM-DD hh:mm:ss"
+                  size="small"
+                  @change="timeChange(toDoTime, index)"
+                >
+                </el-date-picker>
+              </div>
               <div
                 v-show="isShowFooter && currentLi === index"
                 class="functionDiv"
@@ -135,7 +176,8 @@
                     ><el-button
                       type="primary"
                       circle
-                      @click="editToDOList(index)"
+                      @click="editToDoList(index)"
+                      size="small"
                       ><el-icon><edit /></el-icon></el-button></template
                 ></el-popover>
                 <el-popover
@@ -144,12 +186,14 @@
                   :width="150"
                   trigger="hover"
                   content="完成记事"
+                  v-if="!todoItem.isCompleted"
                 >
                   <template #reference>
                     <el-button
                       v-if="!todoItem.isCompleted"
                       type="success"
                       circle
+                      size="small"
                       @click="completeToDo(index)"
                     >
                       <el-icon><check /></el-icon>
@@ -164,7 +208,11 @@
                   content="删除记事"
                 >
                   <template #reference>
-                    <el-button type="info" circle @click="deleteToDo(index)"
+                    <el-button
+                      type="info"
+                      circle
+                      @click="deleteToDo(index)"
+                      size="small"
                       ><el-icon><delete /></el-icon></el-button></template
                 ></el-popover>
                 <!--编辑记事对话框-->
@@ -187,50 +235,18 @@
                   </template>
                 </el-dialog>
               </div>
-              <div class="endTime">
-                <div v-if="!isShowDatePicker[index]">
-                  <el-icon
-                    v-if="
-                      todoItem.toDoTime !== '' && todoItem.toDoTime !== null
-                    "
-                  >
-                    <clock
-                  /></el-icon>
-                  {{ todoItem.toDoTime
-                  }}<el-icon
-                    class="edit-todoTime"
-                    color="gray"
-                    v-show="isShowFooter && currentLi === index"
-                    @click="editToDoTime(index)"
-                    ><edit-pen
-                  /></el-icon>
-                </div>
-                <el-date-picker
-                  v-model="toDoTime"
-                  type="datetime"
-                  :shortcuts="shortcuts"
-                  value-format="YYYY-MM-DD hh:mm:ss"
-                  size="small"
-                  v-if="isShowDatePicker[index]"
-                  @change="timeChange(toDoTime, index)"
-                >
-                </el-date-picker>
-              </div>
-            </el-footer>
-          </el-container>
-        </li>
-      </ul>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
     </div>
   </div>
-  <!-- <TagSetting :isShowTagSetting="isShowTagSetting"></TagSetting> -->
 </template>
 <script>
 import store from "@/store/index.js";
 import AddToDo from "@/components/AddToDo.vue";
 import EditToDo from "@/components/EditToDo.vue";
 import { ElMessageBox, ElMessage } from "element-plus";
-// import TagSetting from "@/components/TagSetting.vue";
-
 export default {
   name: "ToDoListView",
   components: { AddToDo, EditToDo },
@@ -238,13 +254,10 @@ export default {
     return {
       // toDoLists: store.state.toDoLists,
       inputToDo: "",
-      todoStatus: { isCompleted: "", isOutOfTime: "" },
       // 是否展示添加记事对话框
       addToDoDialogVisible: false,
       // 添加记事对话框标题
       addToDoDialogTitle: "添加记事",
-      // 传递给子组件dialog
-      // whichComponent: AddToDo
       // 鼠标聚焦时才显示footer
       isShowFooter: false,
       currentLi: 0,
@@ -281,51 +294,61 @@ export default {
   store,
   methods: {
     getFocus($event, index) {
-      $event.currentTarget.classList.add("focus");
       this.isShowFooter = true;
       this.currentLi = index;
     },
     removeFocus($event) {
-      $event.currentTarget.classList.remove("focus");
       this.isShowFooter = false;
       this.currentLi = null;
     },
     updateToDoListTag(index, tagObj) {
-      store.commit("updateToDoListTag", { index: index, tagObj: tagObj });
+      // store.commit("updateToDoListTag", { index: index, tagObj: tagObj });
+      this.toDoLists[index].toDoTags.push(tagObj);
     },
     // 标签选择器选择改变
     change(val, index) {
-      // alert("当前选择:" + val);
-      ElMessageBox.confirm(
-        "当前选择新增标签为:" + val + "，确认新增?",
-        "提示",
-        {
-          confirmButtonText: "确认",
-          cancelButtonText: "取消",
-          type: "info",
-        }
-      )
-        .then(() => {
-          // 新增标签逻辑
-          const tagObj = { name: val };
-          this.updateToDoListTag(index, tagObj);
-          this.selectVisible[index] = false;
-          ElMessage({
-            type: "success",
-            message: "新增标签成功",
-          });
-        })
-        .catch(() => {
-          // 新增失败
-          this.selectVisible[index] = false;
+      let isFlag = false;
+      this.toDoLists[index].toDoTags.forEach((item) => {
+        if (val === item.name) {
+          isFlag = true;
           ElMessage({
             type: "error",
-            message: "取消新增",
+            message: "不能新增已有的标签",
           });
-        });
+        }
+      });
+      if (!isFlag) {
+        ElMessageBox.confirm(
+          "当前选择新增标签为:" + val + "，确认新增?",
+          "提示",
+          {
+            confirmButtonText: "确认",
+            cancelButtonText: "取消",
+            type: "info",
+          }
+        )
+          .then(() => {
+            // 新增标签逻辑
+            const tagObj = { name: val };
+            this.updateToDoListTag(index, tagObj);
+            this.selectVisible[index] = false;
+            ElMessage({
+              type: "success",
+              message: "新增标签成功",
+            });
+          })
+          .catch(() => {
+            // 新增失败
+            this.selectVisible[index] = false;
+            ElMessage({
+              type: "error",
+              message: "取消新增",
+            });
+          });
+      }
     }, // change
     // 编辑记事
-    editToDOList(index) {
+    editToDoList(index) {
       this.editToDoDialogVisible = true;
       this.currentLi = index;
     },
@@ -344,17 +367,18 @@ export default {
         }
       });
     },
-    // 修改提醒事件
+    // 修改提醒时间
     editToDoTime(index) {
       // alert("修改todoTime");
       this.isShowDatePicker[index] = true;
     },
     // 时间选择器选择改变
     timeChange(value, index) {
-      store.commit("updateToDoTime", {
-        index: index,
-        toDoTime: value,
-      });
+      // store.commit("updateToDoTime", {
+      //   index: index,
+      //   toDoTime: value,
+      // });
+      this.toDoLists[index].toDoTime = value;
       this.isShowDatePicker[index] = false;
       ElMessage({
         message: "修改提醒时间成功",
@@ -365,10 +389,11 @@ export default {
     },
     // 完成记事
     completeToDo(index) {
-      store.commit("updateToDoIsComplete", {
-        index: index,
-        isCompleted: true,
-      });
+      // store.commit("updateToDoIsComplete", {
+      //   index: index,
+      //   isCompleted: true,
+      // });
+      this.toDoLists[index].isCompleted = true;
       ElMessage({
         message: "待办已完成",
         center: true,
@@ -379,6 +404,7 @@ export default {
     // 删除记事
     deleteToDo(index) {
       store.commit("deleteToDo", { index: index });
+      // this.toDoLists.splice(index, 1);
       ElMessage({
         message: "记事已删除",
         center: true,
@@ -394,11 +420,6 @@ export default {
   computed: {
     toDoLists() {
       return store.getters.getSearchToDoLists(store.state.searchContent);
-      // if (store.state.searchContent.trim() !== "") {
-      //   return store.getters.getSearchToDoLists(store.state.searchContent);
-      // } else {
-      //   return store.state.toDoLists;
-      // }
     },
     isHaveToDo() {
       if (store.state.toDoLists.length !== 0) {
@@ -407,25 +428,12 @@ export default {
         return false;
       }
     },
-    isCompleted(val) {
-      if (val === true) return true;
-      return false;
-    },
     // 标签选择器
     toDoTagsOptions() {
       return store.state.toDoTagsOptions;
     },
-    // isShowTagSetting() {
-    //   if (store.state.showUpdateTagMenu) {
-    //     return true;
-    //   } else {
-    //     return false;
-    //   }
-    // },
   },
   mounted() {
-    // return this.selectVisible && this.currentLi === index;
-    // const length = this.toDoLists.length;
     this.toDoLists.forEach((item) => {
       this.selectVisible.push(false);
       this.isShowDatePicker.push(false);
@@ -434,74 +442,71 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.inputToDoButton {
-  margin-top: 20px;
-  margin-left: 20px;
-  width: 100px;
-}
 .inputToDo {
   margin-top: 20px;
   margin-left: 20px;
   width: 500px;
 }
-.toListItem {
-  list-style: none;
-  border: 1px solid rgba(111, 111, 111, 0.5);
-  border-radius: 5px;
-  width: 400px;
-  height: 400px;
-  margin: 20px;
-  float: left;
+.todoStatus {
+  float: right;
+  margin-top: 10px;
 }
-.container {
-  .todoItemHeader {
-    text-align: left;
-    line-height: 60px;
-  }
-  .todoItemContent {
-    width: 400px;
-    height: 300px;
-    .content {
-      width: 100%;
-      height: 200px;
-      overflow-y: auto;
-    }
-  }
-  .footer {
-    height: 40px;
-    .functionDiv {
-      float: left;
-    }
-    .endTime {
-      float: right;
-      font-size: 14px;
-      text-align: right;
-      color: gray;
-    }
-    .edit-todoTime {
-      margin-left: 5px;
-    }
-  }
-  .todoStatus {
-    float: right;
+.isNullDiv {
+  width: 500px;
+  height: 30px;
+  text-align: center;
+  margin: 0 auto;
+  margin-top: 200px;
+  font-size: 30px;
+  color: gray;
+}
+.isNotNullDiv {
+  margin-top: 50px;
+  .el-col-style {
     margin-top: 10px;
   }
-}
-.allCompleted {
-  width: 100px;
-  height: 30px;
-  margin: 0 auto;
-  margin-top: 50px;
-}
-.focus {
-  box-shadow: 0px -1px 0px 0px #bbb9b9, /*上边阴影 */ -0.2px 0px 0px 0px #bbb9b9,
-    /*左边阴影  */ 0.2px 0px 0px 0px #bbb9b9,
-    /*右边阴影 */ 0px 1px 0px 0px #bbb9b9; /*下边阴影 */
+  .content {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .bottom {
+    .timeDiv {
+      height: 30px;
+      float: right;
+      line-height: 30px;
+      margin-bottom: 10px;
+      .edit-todoTime {
+        margin-right: 5px;
+      }
+      .todoTime {
+        font-size: 14px;
+        margin-left: 3px;
+        margin-right: 5px;
+      }
+      &:deep(.el-input) {
+        width: 165px;
+      }
+      &:deep(.el-input__icon) {
+        height: 24px;
+      }
+    }
+    .functionDiv {
+      height: 30px;
+      float: left;
+      margin-left: 10px;
+      margin-bottom: 10px;
+    }
+  }
 }
 .el-tag {
   margin-right: 5px;
 }
 .tagSelect {
   width: 100px;
+  margin-top: 5px;
+}
+.line-through {
+  text-decoration: line-through;
+  color: gray;
 }
 </style>
