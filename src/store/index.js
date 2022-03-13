@@ -3,7 +3,7 @@ import { createStore } from 'vuex'
 export default createStore({
   state: {
     isCollapse: false,
-    currentMenu: 'todo',
+    currentMenu: '/todo',
     // 记事标签
     toDoTagsOptions: [{ value: "school", label: "school" },
     { value: "生活", label: "生活" },
@@ -60,7 +60,8 @@ export default createStore({
     deletedToDoLists: [],
     // showUpdateTagMenu: false
     searchContent: '',
-    searchResult: []
+    searchResult: [],
+    currentFilterTagName: ''
   },
   getters: {
     notifyToDoLosts(state) { // 需要提醒的记事，在toDoLists中进行过滤
@@ -68,9 +69,9 @@ export default createStore({
         return todo.toDoTime !== '' && todo.toDoTime !== null
       })
     },
-    getClickTagToDoList: (state) => (tagName) => {
+    getClickTagToDoList: (state) => (tagName) => { // 根据标签名进行过滤
       return state.toDoLists.filter(function (item) {
-        return item.toDoTags.forEach(item2 => item2.name === tagName)
+        return (item.toDoTags.findIndex(item2 => item2.name === tagName)) !== -1
       })
     },
     getSearchToDoLists: (state) => (content) => {
@@ -140,6 +141,10 @@ export default createStore({
     updateSearchContent(state, content) {
       state.searchContent = content
     },
+    // 更新当前点击的标签名
+    updateCurrentFilterTagName(state, name) {
+      state.currentFilterTagName = name
+    }
   },
   actions: {
   },

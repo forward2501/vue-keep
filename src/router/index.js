@@ -28,6 +28,7 @@ const routes = [
       {
         path: '/tagSetting',
         name: 'tagSetting',
+        // redirect: '/todo',
         // 懒加载
         component: () => import(/* webpackChunkName: "about" */ '../views/TagSettingView.vue'),
         // component: TagSettingView
@@ -36,6 +37,11 @@ const routes = [
         path: '/deletedToDo',
         name: 'deletedToDo',
         component: () => import(/* webpackChunkName: "about" */ '../views/DeletedToDoView.vue'),
+      },
+      {
+        path: '/tag/:id',
+        name: 'tag',
+        component: () => import(/* webpackChunkName: "about" */ '../views/TagFilterView.vue')
       }
     ]
   },
